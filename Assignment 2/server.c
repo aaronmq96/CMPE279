@@ -59,15 +59,19 @@ int main(int argc, char const *argv[])
           exit(EXIT_FAILURE);
       }
 
-      pid_t child_id = fork();
+      pid_t forked = fork();
 
-      if (child_id < 0)
-      {
-        perror("Fork failed");
-        exit(EXIT_FAILURE);
+     if (forked < 0)
+      { 
+           perror("Failed in creating child process");
+           exit(EXIT_FAILURE);
       }
-
-      else if (child_id == 0)
+      else if (forked > 0)
+      {
+        int status = 0;
+        while ((wait(&status)) > 0);
+      }
+      else 
       {
         char socket_string[12];
         sprintf(socket_string, "%d", new_socket);
@@ -78,13 +82,6 @@ int main(int argc, char const *argv[])
           exit(EXIT_FAILURE);
         }
       }
-
-      else
-      {
-        int status = 0;
-        while ((wait(&status)) > 0);
-      }
-
     }
 
     else
@@ -93,10 +90,11 @@ int main(int argc, char const *argv[])
 
       if (setuid(pwd->pw_uid) != 0)
       {
-        perror("Dropping privileges for child process failed");
+        perror("Could not drop privileges for child process failed");
         exit(EXIT_FAILURE);
       }
-
+      printf("Dropped privileges for child process\n");
+        
       new_socket = atoi(argv[1]);
       valread = read(new_socket, buffer, 1024);
 
@@ -106,7 +104,7 @@ int main(int argc, char const *argv[])
         exit(EXIT_FAILURE);
       }
 
-      printf("Read %d bytes: %s\n", valread, buffer);
+      printf(" %d : %s\n", valread, buffer);
       send(new_socket, hello, strlen(hello), 0);
       printf("Hello message sent\n");
     }
