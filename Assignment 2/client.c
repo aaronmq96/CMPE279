@@ -43,7 +43,7 @@ int main(int argc, char const *argv[])
     send(sock, hello, strlen(hello), 0 ); 
     printf("Hello message sent\n"); 
     valread = read(sock, buffer, 1024); 
-    printf("Read %d bytes: %s\n", valread, buffer);
+    printf("%d : %s\n", valread, buffer);
 
     return 0; 
 } 
